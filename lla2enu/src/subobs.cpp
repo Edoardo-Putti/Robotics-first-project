@@ -13,14 +13,14 @@ class pub_sub
 
 private:
 ros::NodeHandle n; 
-ros::Subscriber sub;
+ros::Subscriber sub1;
 ros::Publisher pub;
 
 
 public:
   	pub_sub(){
-  	sub =n.subscribe("/swiftnav/front/gps_pose", 1, &pub_sub::callback, this);
-	  pub = n.advertise<geometry_msgs::Point>("/emu_front", 1);
+  	sub1 =n.subscribe("/swiftnav/obs/gps_pose", 1, &pub_sub::callback, this);
+	  pub = n.advertise<geometry_msgs::Point>("/emu_obs", 1);
 
     }
 
@@ -104,7 +104,7 @@ public:
 
 int main(int argc, char **argv){
   	
-	ros::init(argc, argv, "listener_front");
+	ros::init(argc, argv, "listener_obstacle");
 
 pub_sub my_pub_sub;
 
