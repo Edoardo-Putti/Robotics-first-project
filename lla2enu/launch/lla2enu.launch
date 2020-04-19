@@ -1,0 +1,15 @@
+<launch>
+
+    <node pkg="lla2enu" name="front" type="enu_front"/>
+        <param name="latitude_init" value="45.6311926152" />
+        <param name="longitude_init" value="9.2947495255" />
+        <param name="h0" value="231.506675163" />
+        
+
+    <node pkg="lla2enu" name="obstacle" type="enu_obs"/>
+        <param name="latitude_init" value="45.6311926152" />
+        <param name="longitude_init" value="9.2947495255" />
+        <param name="h0" value="231.506675163" />
+
+
+</launch>
