@@ -1,18 +1,24 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "sensor_msgs/NavSatFix.h"
-#include <math.h>  
+#include <math.h>
 #include "geometry_msgs/Point.h"
 
 
 class pub_sub
 {
+/*
+message structure of a quaternion 4 float x,y,z,w.
+float w will be the value which will tell us if the GPS work or not.
+Can't use x=0,y=0,z=0 since if i'm in the initial position i will have that
+xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
+*/
 
- geometry_msgs::Point p; 
+ geometry_msgs::Quaternion p;
 
 
 private:
-ros::NodeHandle n; 
+ros::NodeHandle n;
 ros::Subscriber sub;
 ros::Publisher pub;
 
@@ -20,7 +26,7 @@ ros::Publisher pub;
 public:
   	pub_sub(){
   	sub =n.subscribe("/swiftnav/front/gps_pose", 1, &pub_sub::callback, this);
-	  pub = n.advertise<geometry_msgs::Point>("/enu_front", 1);
+	  pub = n.advertise<geometry_msgs::Quaternion>("/enu_front", 1);
 
     }
 
@@ -35,7 +41,7 @@ public:
     double f = (a - b) / a;
     double e_sq = f * (2-f);
     float deg_to_rad = 0.0174533;
-    
+
     // input data from msg
     float latitude = msg->latitude;
     float longitude = msg->longitude;
@@ -43,20 +49,21 @@ public:
 
     if (latitude==0 && longitude==0 && h==0){
 
-       ROS_INFO("Non ricevo il GPS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");  
+       ROS_INFO("Non ricevo il GPS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
       p.x=0;
       p.y=0;
       p.z=0;
+      p.w=0;
       pub.publish(p);
 
-    } 
+    }
   else{
       // fixed position
       float latitude_init;
       float longitude_init;
       float h0;
-      
+
       n.getParam ("/latitude_init", latitude_init);
       n.getParam ("/longitude_init", longitude_init);
       n.getParam ("/h0", h0);
@@ -78,12 +85,12 @@ public:
       float  x = (h + N) * cos_lambda * cos_phi;
       float  y = (h + N) * cos_lambda * sin_phi;
       float  z = (h + (1 - e_sq) * N) * sin_lambda;
-      
+
       ROS_INFO("ECEF position: [%f,%f, %f]", x, y,z);
-      
+
 
       // ecef to enu
-    
+
       lamb = deg_to_rad*(latitude_init);
       phi = deg_to_rad*(longitude_init);
       s = sin(lamb);
@@ -112,15 +119,16 @@ public:
       p.x=xEast;
       p.y=yNorth;
       p.z=zUp;
+      p.w=1;
       pub.publish(p);
-    
-    }    
+
+    }
   }
 
 };
 
 int main(int argc, char **argv){
-  	
+
 	ros::init(argc, argv, "listener_front");
 
 pub_sub my_pub_sub;
@@ -130,5 +138,3 @@ pub_sub my_pub_sub;
 
   return 0;
 }
-
-
