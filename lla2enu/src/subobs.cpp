@@ -20,7 +20,7 @@ ros::Publisher pub;
 public:
   	pub_sub(){
   	sub1 =n.subscribe("/swiftnav/obs/gps_pose", 1, &pub_sub::callback, this);
-	  pub = n.advertise<geometry_msgs::Point>("/emu_obs", 1);
+	  pub = n.advertise<geometry_msgs::Point>("/enu_obs", 1);
 
     }
 
@@ -41,11 +41,29 @@ public:
     float longitude = msg->longitude;
     float h = msg->altitude;
 
-    // fixed position
-    float latitude_init = 45.6311926152;
-    float longitude_init = 9.2947495255;
-    float h0 = 231.506675163;
+if (latitude==0 && longitude==0 && h==0){
 
+   ROS_INFO("Non ricevo il GPS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");  
+
+      p.x=0;
+      p.y=0;
+      p.z=0;
+      pub.publish(p);
+} 
+else{
+
+    // fixed position
+    float latitude_init;
+    float longitude_init;
+    float h0;
+    
+    n.getParam ("/latitude_init", latitude_init);
+    n.getParam ("/longitude_init", longitude_init);
+    n.getParam ("/h0", h0);
+
+    ROS_INFO("values: %f %f %f",latitude_init,longitude_init, h0);
+
+   
 
     //lla to ecef
     float lamb = deg_to_rad*(latitude);
@@ -99,7 +117,7 @@ public:
     
     
   }
-
+  }
 };
 
 int main(int argc, char **argv){
