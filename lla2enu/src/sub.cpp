@@ -2,7 +2,7 @@
 #include "std_msgs/String.h"
 #include "sensor_msgs/NavSatFix.h"
 #include <math.h>
-#include "geometry_msgs/Point.h"
+#include "geometry_msgs/QuaternionStamped.h"
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 
@@ -15,7 +15,7 @@ Can't use x=0,y=0,z=0 since if i'm in the initial position i will have that
 xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
 */
 
- geometry_msgs::Quaternion p;
+ geometry_msgs::QuaternionStamped p;
 
 
 private:
@@ -27,7 +27,7 @@ ros::Publisher pub;
 public:
   	pub_sub(){
   	sub =n.subscribe("/swiftnav/front/gps_pose", 1, &pub_sub::callback, this);
-	  pub = n.advertise<geometry_msgs::Quaternion>("/enu_front", 1);
+	  pub = n.advertise<geometry_msgs::QuaternionStamped>("/enu_front", 1);
 
     }
 
@@ -52,10 +52,13 @@ public:
 
        ROS_INFO("Non ricevo il GPS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-      p.x=0;
-      p.y=0;
-      p.z=0;
-      p.w=0;
+
+     	p.header.stamp = ros::Time::now();
+		  p.header.frame_id = "car";  
+      p.quaternion.x=0;
+      p.quaternion.y=0;
+      p.quaternion.z=0;
+      p.quaternion.w=0;
       pub.publish(p);
 
     }
@@ -117,10 +120,12 @@ public:
       ROS_INFO("ENU position: [%f,%f, %f]", xEast, yNorth,zUp);
 
 
-      p.x=xEast;
-      p.y=yNorth;
-      p.z=zUp;
-      p.w=1;
+      p.header.stamp = ros::Time::now();
+		  p.header.frame_id = "car";  
+      p.quaternion.x=xEast;
+      p.quaternion.y=yNorth;
+      p.quaternion.z=zUp;
+      p.quaternion.w=1;
       pub.publish(p);
 
     }

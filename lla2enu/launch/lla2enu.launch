@@ -1,6 +1,6 @@
 <launch>
 
-    <node pkg="rosbag" type="play" name="player" output="screen" args="$(dirname)/project.bag"/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="-r 10 $(dirname)/project.bag"/>
 
     <node pkg="lla2enu" name="front" type="enu_front"/>
         <param name="latitude_init" value="45.6216561271" />
@@ -12,6 +12,8 @@
         <param name="latitude_init" value="45.6216561271" />
         <param name="longitude_init" value="9.28155230131" />
         <param name="h0" value="224.616616895" />
+    
+     <node pkg="lla2enu" name="collector" type="collector"/>
 
 
 </launch>
