@@ -15,5 +15,7 @@
     
      <node pkg="lla2enu" name="collector" type="collector"/>
 
+      <node pkg="lla2enu" name="distance_calc" type="distance_calc"/>
+
 
 </launch>

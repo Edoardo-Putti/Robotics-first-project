@@ -39,6 +39,7 @@ add_executable(collector src/collector.cpp)
 add_dependencies(collector ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(collector ${catkin_LIBRARIES})
 
+
 add_executable(distance_calc src/distance_calc.cpp)
 add_dependencies(distance_calc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(distance_calc ${catkin_LIBRARIES})

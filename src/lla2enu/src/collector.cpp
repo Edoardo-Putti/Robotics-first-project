@@ -24,7 +24,7 @@
 
   //  ros::ServiceClient<lla2enu::DistanceCalculator>("distance_calc");
 
-    ros::ServiceClient client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
+    ros::ServiceClient client;
     lla2enu::DistanceCalculator srv;
 
    // ros::Subscriber sub1;
@@ -35,7 +35,7 @@
     collettore(){
         sub1.subscribe(n, "enu_front", 1);
         sub2.subscribe(n, "enu_obs", 1);
-    
+        client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
    //typedef message_filters::sync_policies::ExactTime<geometry_msgs::QuaternionStamped, geometry_msgs::QuaternionStamped> MySyncPolicy;
         sync.reset(new Sync(MySyncPolicy(10), sub1, sub2));
         sync->registerCallback(boost::bind(&collettore::callback,this, _1, _2));

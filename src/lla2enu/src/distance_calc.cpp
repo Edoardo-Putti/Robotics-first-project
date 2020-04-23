@@ -2,7 +2,7 @@
 #include "lla2enu/DistanceCalculator.h"
 
 
-bool dist(lla2enu::DistanceCalculator::Request  &req,
+bool distanza(lla2enu::DistanceCalculator::Request  &req,
          lla2enu::DistanceCalculator::Response &res){
 
     float toRadians = 0.0174533;
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "distance_calc_server");
   ros::NodeHandle n;
-  ros::ServiceServer service = n.advertiseService("distance_calc", dist);
+  ros::ServiceServer service = n.advertiseService("distance_calc", distanza);
   ROS_INFO("Ready to compute the distance");
   ros::spin();
 
