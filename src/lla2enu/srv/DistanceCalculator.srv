@@ -1,0 +1,6 @@
+float64 x
+float64 y
+float64 x_obs
+float64 y_obs
+---
+float64 distance

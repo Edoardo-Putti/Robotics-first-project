@@ -6,14 +6,26 @@
   #include <message_filters/time_synchronizer.h>
   #include <message_filters/sync_policies/exact_time.h>
   #include <message_filters/sync_policies/approximate_time.h>
+  #include "lla2enu/DistanceCalculator.h"
 
-  //#include "service/AddTwoInts.h"
 
 
   class collettore
   {
 
 
+  private:
+    ros::NodeHandle n;
+    message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub1;
+    message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub2;
+    typedef message_filters::sync_policies::ApproximateTime<geometry_msgs::QuaternionStamped, geometry_msgs::QuaternionStamped> MySyncPolicy;
+    typedef message_filters::Synchronizer<MySyncPolicy> Sync;
+    boost::shared_ptr<Sync> sync;
+
+  //  ros::ServiceClient<lla2enu::DistanceCalculator>("distance_calc");
+
+    ros::ServiceClient client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
+    lla2enu::DistanceCalculator srv;
 
    // ros::Subscriber sub1;
    // ros::Subscriber sub2;
@@ -23,6 +35,7 @@
     collettore(){
         sub1.subscribe(n, "enu_front", 1);
         sub2.subscribe(n, "enu_obs", 1);
+    
    //typedef message_filters::sync_policies::ExactTime<geometry_msgs::QuaternionStamped, geometry_msgs::QuaternionStamped> MySyncPolicy;
         sync.reset(new Sync(MySyncPolicy(10), sub1, sub2));
         sync->registerCallback(boost::bind(&collettore::callback,this, _1, _2));
@@ -44,16 +57,22 @@
 
       ROS_INFO ("banana : GPS Funziona ");
 
+      srv.request.x = front_msg->quaternion.x;
+      srv.request.y = front_msg->quaternion.y;
+      srv.request.x_obs = obs_msg->quaternion.x;
+      srv.request.y_obs = obs_msg->quaternion.y;
+
+          if (client.call(srv))
+      {
+            ROS_INFO("Sum: %f", srv.response.distance);
+          }
+          else 
+          {
+            ROS_ERROR("Failed to call service distance calculator");
+            
     }
   }
-
-  private:
-    ros::NodeHandle n;
-    message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub1;
-    message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub2;
-    typedef message_filters::sync_policies::ApproximateTime<geometry_msgs::QuaternionStamped, geometry_msgs::QuaternionStamped> MySyncPolicy;
-    typedef message_filters::Synchronizer<MySyncPolicy> Sync;
-    boost::shared_ptr<Sync> sync;
+  }
 
   };
 
