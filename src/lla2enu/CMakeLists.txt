@@ -25,7 +25,6 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 
 
-
 add_executable(enu_front src/sub.cpp)
 add_dependencies(enu_front ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(enu_front ${catkin_LIBRARIES})

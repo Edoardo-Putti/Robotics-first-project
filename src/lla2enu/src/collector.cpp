@@ -1,7 +1,7 @@
   #include "ros/ros.h"
   #include "std_msgs/String.h"
   #include "geometry_msgs/QuaternionStamped.h"
-
+ 
   #include <message_filters/subscriber.h>
   #include <message_filters/time_synchronizer.h>
   #include <message_filters/sync_policies/exact_time.h>
@@ -66,7 +66,7 @@
 
           if (client.call(srv))
       {
-            ROS_INFO("Sum: %f", srv.response.distance);
+            ROS_INFO("Distance: %f, Flag: %s ", srv.response.distance, srv.response.flag.c_str());
           }
           else 
           {

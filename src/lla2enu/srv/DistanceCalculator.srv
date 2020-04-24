@@ -6,3 +6,4 @@ float64 y_obs
 float64 z_obs
 ---
 float64 distance
+string flag
