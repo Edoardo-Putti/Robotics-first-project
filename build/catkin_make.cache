@@ -1,0 +1,2 @@
+lla2enu
+-DCATKIN_DEVEL_PREFIX=/home/edo/Robotics/devel -DCMAKE_INSTALL_PREFIX=/home/edo/Robotics/install -G Unix Makefiles
