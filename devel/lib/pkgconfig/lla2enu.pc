@@ -1,0 +1,8 @@
+prefix=/home/edo/Robotics/devel
+
+Name: lla2enu
+Description: Description of lla2enu
+Version: 0.0.0
+Cflags: -I/home/edo/Robotics/devel/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime geometry_msgs message_filters
