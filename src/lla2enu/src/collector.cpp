@@ -31,7 +31,7 @@ public:
     sub1.subscribe(n, "enu_front", 1);
     sub2.subscribe(n, "enu_obs", 1);
     client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
-    custom_pub = n.advertise<lla2enu::custom>("custum_message");
+    custom_pub = n.advertise<lla2enu::custom>("custum_message",1);
     sync.reset(new Sync(MySyncPolicy(10), sub1, sub2));
     sync->registerCallback(boost::bind(&collettore::callback,this, _1, _2));
 
