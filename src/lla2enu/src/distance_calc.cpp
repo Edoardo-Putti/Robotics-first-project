@@ -13,7 +13,7 @@ bool distanza(lla2enu::DistanceCalculator::Request  &req,
     float z1=req.z;
     float x2=req.x_obs;
     float y2=req.y_obs;
-    float z2=req.z_obs
+    float z2=req.z_obs;
 
 ROS_INFO(" Pronto per calcolare Input x: %f y: %f x_obs: %f y_obs: %f",req.x,req.y,req.x_obs,req.y_obs );
 
