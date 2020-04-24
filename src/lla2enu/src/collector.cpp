@@ -1,7 +1,7 @@
   #include "ros/ros.h"
   #include "std_msgs/String.h"
   #include "geometry_msgs/QuaternionStamped.h"
- 
+  #include "lla2enu/custom.h"
   #include <message_filters/subscriber.h>
   #include <message_filters/time_synchronizer.h>
   #include <message_filters/sync_policies/exact_time.h>
@@ -10,37 +10,32 @@
 
 
 
-  class collettore
-  {
+class collettore
+{
 
 
-  private:
-    ros::NodeHandle n;
-    message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub1;
-    message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub2;
-    typedef message_filters::sync_policies::ApproximateTime<geometry_msgs::QuaternionStamped, geometry_msgs::QuaternionStamped> MySyncPolicy;
-    typedef message_filters::Synchronizer<MySyncPolicy> Sync;
-    boost::shared_ptr<Sync> sync;
+private:
+  ros::NodeHandle n;
+  message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub1;
+  message_filters::Subscriber<geometry_msgs::QuaternionStamped> sub2;
+  typedef message_filters::sync_policies::ApproximateTime<geometry_msgs::QuaternionStamped, geometry_msgs::QuaternionStamped> MySyncPolicy;
+  typedef message_filters::Synchronizer<MySyncPolicy> Sync;
+  boost::shared_ptr<Sync> sync;
+  ros::ServiceClient client;
+  ros::Publisher custom_pub;
+  lla2enu::DistanceCalculator srv;
 
-  //  ros::ServiceClient<lla2enu::DistanceCalculator>("distance_calc");
 
-    ros::ServiceClient client;
-    lla2enu::DistanceCalculator srv;
+public:
+  collettore(){
+    sub1.subscribe(n, "enu_front", 1);
+    sub2.subscribe(n, "enu_obs", 1);
+    client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
+    custom_pub = n.advertise<lla2enu::custom>("custum_message");
+    sync.reset(new Sync(MySyncPolicy(10), sub1, sub2));
+    sync->registerCallback(boost::bind(&collettore::callback,this, _1, _2));
 
-   // ros::Subscriber sub1;
-   // ros::Subscriber sub2;
-  //  ros::Publisher pub;
-
-  public:
-    collettore(){
-        sub1.subscribe(n, "enu_front", 1);
-        sub2.subscribe(n, "enu_obs", 1);
-        client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
-   //typedef message_filters::sync_policies::ExactTime<geometry_msgs::QuaternionStamped, geometry_msgs::QuaternionStamped> MySyncPolicy;
-        sync.reset(new Sync(MySyncPolicy(10), sub1, sub2));
-        sync->registerCallback(boost::bind(&collettore::callback,this, _1, _2));
-
-        }
+  }
 
 
   void callback(const geometry_msgs::QuaternionStampedConstPtr& front_msg, const geometry_msgs::QuaternionStampedConstPtr& obs_msg)
@@ -64,29 +59,33 @@
       srv.request.y_obs = obs_msg->quaternion.y;
       srv.request.z_obs = obs_msg->quaternion.z;
 
-          if (client.call(srv))
+      if (client.call(srv))
       {
-            ROS_INFO("Distance: %f, Flag: %s ", srv.response.distance, srv.response.flag.c_str());
-          }
-          else 
-          {
-            ROS_ERROR("Failed to call service distance calculator");
-            
+        ROS_INFO("Distance: %f, Flag: %s ", srv.response.distance, srv.response.flag.c_str());
+        lla2enu::custom msg;
+        msg.distance = srv.response.distance;
+        msg.flag = srv.response.flag.c_str();
+        custom_pub.publish(msg);
+      }
+      else 
+      {
+        ROS_ERROR("Failed to call service distance calculator");
+
+      }
     }
   }
-  }
 
-  };
+};
 
-  int main(int argc, char** argv)
-  {
-    ros::init(argc, argv, "collector");
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "collector");
 
   collettore my_collettore;
 
-    ros::spin();
+  ros::spin();
 
-    return 0;
-  }
+  return 0;
+}
 
 
