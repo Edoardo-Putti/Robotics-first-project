@@ -49,18 +49,20 @@
 
     if (front_msg->quaternion.w == 0 || obs_msg->quaternion.w == 0){
 
-      ROS_INFO ("banana : GPS Missing ");
+      ROS_INFO ("GPS Missing ");
 
     }
 
     else{
 
-      ROS_INFO ("banana : GPS Funziona ");
+      ROS_INFO ("GPS Working ");
 
       srv.request.x = front_msg->quaternion.x;
       srv.request.y = front_msg->quaternion.y;
+      srv.request.z = front_msg->quaternion.z;
       srv.request.x_obs = obs_msg->quaternion.x;
       srv.request.y_obs = obs_msg->quaternion.y;
+      srv.request.z_obs = obs_msg->quaternion.z;
 
           if (client.call(srv))
       {
