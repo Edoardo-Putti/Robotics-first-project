@@ -2,20 +2,20 @@
 #include "std_msgs/String.h"
 #include "sensor_msgs/NavSatFix.h"
 #include <math.h>
-#include "geometry_msgs/QuaternionStamped.h"
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include "geometry_msgs/Vector3Stamped.h"
+
 
 
 class pub_sub
 {
 /*
-message structure of a quaternion 4 float x,y,z,w.
+message structure of a Vector3 4 float x,y,z,w.
 float w will be the value which will tell us if the GPS work or not.
 Can't use x=0,y=0,z=0 since if i'm in the initial position i will have that
 xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
 */
 
- geometry_msgs::QuaternionStamped p;
+ geometry_msgs::Vector3Stamped p;
 
 
 private:
@@ -27,7 +27,7 @@ ros::Publisher pub;
 public:
   	pub_sub(){
   	sub =n.subscribe("/swiftnav/front/gps_pose", 1, &pub_sub::callback, this);
-	  pub = n.advertise<geometry_msgs::QuaternionStamped>("/enu_front", 1);
+	  pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_front", 1);
 
     }
 
@@ -55,10 +55,9 @@ public:
 
      	p.header.stamp = ros::Time::now();
 		  p.header.frame_id = "car";  
-      p.quaternion.x=0;
-      p.quaternion.y=0;
-      p.quaternion.z=0;
-      p.quaternion.w=0;
+      p.vector.x=std::numeric_limits<float>::quiet_NaN();
+      p.vector.y=std::numeric_limits<float>::quiet_NaN();
+      p.vector.z=std::numeric_limits<float>::quiet_NaN();
       pub.publish(p);
 
     }
@@ -122,10 +121,10 @@ public:
 
       p.header.stamp = ros::Time::now();
 		  p.header.frame_id = "car";  
-      p.quaternion.x=xEast;
-      p.quaternion.y=yNorth;
-      p.quaternion.z=zUp;
-      p.quaternion.w=1;
+      p.vector.x=xEast;
+      p.vector.y=yNorth;
+      p.vector.z=zUp;
+
       pub.publish(p);
 
     }
