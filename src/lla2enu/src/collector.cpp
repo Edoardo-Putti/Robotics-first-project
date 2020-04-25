@@ -31,7 +31,11 @@ public:
     sub1.subscribe(n, "enu_front", 1);
     sub2.subscribe(n, "enu_obs", 1);
     client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
+<<<<<<< HEAD
     custom_pub = n.advertise<lla2enu::custom>("custum_message",1);
+=======
+    custom_pub = n.advertise<lla2enu::custom>("custom_message");
+>>>>>>> a1c547618b8dbd7e5946193421026a56ebbfdb08
     sync.reset(new Sync(MySyncPolicy(10), sub1, sub2));
     sync->registerCallback(boost::bind(&collettore::callback,this, _1, _2));
 
@@ -67,7 +71,7 @@ public:
         msg.flag = srv.response.flag.c_str();
         custom_pub.publish(msg);
       }
-      else 
+      else
       {
         ROS_ERROR("Failed to call service distance calculator");
 
@@ -87,5 +91,3 @@ int main(int argc, char** argv)
 
   return 0;
 }
-
-
