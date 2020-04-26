@@ -70,7 +70,7 @@ public:
 
 
      	p.header.stamp = ros::Time::now();
-		  p.header.frame_id = "car";  
+		  p.header.frame_id = "car";
       p.vector.x=std::numeric_limits<float>::quiet_NaN();
       p.vector.y=std::numeric_limits<float>::quiet_NaN();
       p.vector.z=std::numeric_limits<float>::quiet_NaN();
@@ -136,7 +136,7 @@ public:
 
 
       p.header.stamp = ros::Time::now();
-		  p.header.frame_id = "car";  
+		  p.header.frame_id = "car";
       p.vector.x=xEast;
       p.vector.y=yNorth;
       p.vector.z=zUp;
@@ -145,7 +145,7 @@ public:
 
       odom.header.stamp = ros::Time::now();
       odom.header.frame_id = "map";
-      odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 !!!!!!!!!
+      odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
       odom.pose.pose.position.y = yNorth/100;
       odom.pose.pose.position.z = zUp/100;
       odom.child_frame_id = "car_obs";
@@ -168,7 +168,7 @@ public:
   zU_old=zUp;
 
 */
- 
+
   transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );  //DA modoifcare togliere diviso 100!!!!
 
   tf::Quaternion q;
