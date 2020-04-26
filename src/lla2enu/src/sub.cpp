@@ -30,11 +30,19 @@ ros::Publisher pub_odom;
 tf::Transform transform;
 tf::TransformBroadcaster br;
 
+/*float xE_old;
+float yN_old;
+float zU_old;
+float yaw;
+float pitch;
+*/
+
 public:
   	pub_sub(){
   	sub =n.subscribe("/swiftnav/front/gps_pose", 1, &pub_sub::callback, this);
 	  pub = n.advertise<geometry_msgs::QuaternionStamped>("/enu_front", 1);
     pub_odom = n.advertise<nav_msgs::Odometry>("/odom_front", 1);
+
 
     }
 
@@ -144,8 +152,21 @@ public:
       pub_odom.publish(odom);
       pub.publish(p);
 
+/*
+
+  xE_old=xEast-xE_old;
+  yN_old=yNorth-yN_old;
+  zU_old=zUp-zU_old;
+
+  yaw= acos(((xE_old*xE_old)+(yN_old*yN_old))/(sqrt(pow(xE_old,2)+pow(yN_old ,2)+pow(zU_old,2))*sqrt(pow(xE_old,2)+pow(yN_old,2))));
+  pitch= acos((yN_old*yN_old)/(yN_old*sqrt(pow(xE_old,2)+pow(yN_old,2))));
 
 
+  xE_old=xEast;
+  yN_old=yNorth;
+  zU_old=zUp;
+
+*/
  
   transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );
 
