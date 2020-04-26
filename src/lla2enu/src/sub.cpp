@@ -5,6 +5,10 @@
 #include "geometry_msgs/QuaternionStamped.h"
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
+#include <nav_msgs/Odometry.h>
+#include <tf/transform_broadcaster.h>
+
+
 
 class pub_sub
 {
@@ -16,18 +20,21 @@ xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
 */
 
  geometry_msgs::QuaternionStamped p;
-
+ nav_msgs::Odometry odom;
 
 private:
 ros::NodeHandle n;
 ros::Subscriber sub;
 ros::Publisher pub;
-
+ros::Publisher pub_odom;
+tf::Transform transform;
+tf::TransformBroadcaster br;
 
 public:
   	pub_sub(){
   	sub =n.subscribe("/swiftnav/front/gps_pose", 1, &pub_sub::callback, this);
 	  pub = n.advertise<geometry_msgs::QuaternionStamped>("/enu_front", 1);
+    pub_odom = n.advertise<nav_msgs::Odometry>("/odom_front", 1);
 
     }
 
@@ -126,7 +133,30 @@ public:
       p.quaternion.y=yNorth;
       p.quaternion.z=zUp;
       p.quaternion.w=1;
+
+      odom.header.stamp = ros::Time::now();
+      odom.header.frame_id = "map";
+      odom.pose.pose.position.x =xEast/100;
+      odom.pose.pose.position.y = yNorth/100;
+      odom.pose.pose.position.z = zUp/100;
+      odom.child_frame_id = "car_obs";
+
+      pub_odom.publish(odom);
       pub.publish(p);
+
+
+
+ 
+  transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );
+
+  tf::Quaternion q;
+  q.setRPY(0, 0, 0);
+  transform.setRotation(q);
+
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "car_tf"));
+
+
+
 
     }
   }

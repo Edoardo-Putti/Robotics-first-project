@@ -18,19 +18,11 @@ ROS_INFO(" Pronto per calcolare Input x: %f y: %f x_obs: %f y_obs: %f",req.x,req
 
     float ans = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2) + pow(z2 - z1, 2) );
 
-    if(ans > 5){
-	res.flag = "Safe";
-	}
-    else if(ans > 1 && ans <= 5){
-	res.flag = "Unsafe";
-	}
-    else{
-	res.flag = "Crash";
-	}
+
     res.distance=ans;
 
     ROS_INFO("Ho calcolato la distanza: %f",res.distance);
-    ROS_INFO("Ho settato la flag: %s",res.flag.c_str());
+
      
     return true; 
 

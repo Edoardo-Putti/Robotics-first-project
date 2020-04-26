@@ -8,11 +8,16 @@
   #include <message_filters/sync_policies/approximate_time.h>
   #include "lla2enu/DistanceCalculator.h"
 
+  #include <dynamic_reconfigure/server.h>
+  #include <lla2enu/parametersConfig.h>
+
 
 
 class collettore
 {
 
+int safe;
+int unsafe;
 
 private:
   ros::NodeHandle n;
@@ -25,6 +30,10 @@ private:
   ros::Publisher custom_pub;
   lla2enu::DistanceCalculator srv;
 
+  dynamic_reconfigure::Server<lla2enu::parametersConfig> server;
+  dynamic_reconfigure::Server<lla2enu::parametersConfig>::CallbackType f;
+
+
 
 public:
   collettore(){
@@ -34,6 +43,12 @@ public:
     custom_pub = n.advertise<lla2enu::custom>("custom_message",1);
     sync.reset(new Sync(MySyncPolicy(10), sub1, sub2));
     sync->registerCallback(boost::bind(&collettore::callback,this, _1, _2));
+    n.getParam ("/unsafe", unsafe);
+    n.getParam ("/safe", safe);
+
+      f = boost::bind(&collettore::dynamic_callback,this, _1);
+      server.setCallback(f);
+
 
   }
 
@@ -61,12 +76,25 @@ public:
 
       if (client.call(srv))
       {
-        ROS_INFO("Distance: %f, Flag: %s ", srv.response.distance, srv.response.flag.c_str());
+        ROS_INFO("Distance: %f ", srv.response.distance);
         lla2enu::custom msg;
         msg.distance = srv.response.distance;
-        msg.flag = srv.response.flag.c_str();
+        
+
+      if(msg.distance > safe){
+        msg.flag = "Safe";
+        }
+          else if(msg.distance > unsafe && msg.distance <= safe){
+        msg.flag = "Unsafe";
+        }
+          else{
+        msg.flag = "Crash";
+        }
+
         custom_pub.publish(msg);
       }
+
+      
       else
       {
         ROS_ERROR("Failed to call service distance calculator");
@@ -74,6 +102,12 @@ public:
       }
     }
   }
+
+  void dynamic_callback ( lla2enu::parametersConfig &config) {
+    ROS_INFO("Reconfigure Request: %d, %d",config.safe_param, config.unsafe_param);
+            safe = config.safe_param;
+           unsafe = config.unsafe_param;
+}
 
 };
 
