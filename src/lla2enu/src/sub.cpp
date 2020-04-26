@@ -2,9 +2,7 @@
 #include "std_msgs/String.h"
 #include "sensor_msgs/NavSatFix.h"
 #include <math.h>
-#include "geometry_msgs/QuaternionStamped.h"
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
+#include "geometry_msgs/Vector3Stamped.h"
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
 
@@ -19,18 +17,21 @@ Can't use x=0,y=0,z=0 since if i'm in the initial position i will have that
 xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
 */
 
- geometry_msgs::QuaternionStamped p;
+geometry_msgs::Vector3Stamped p;
  nav_msgs::Odometry odom;
 
 private:
 ros::NodeHandle n;
 ros::Subscriber sub;
 ros::Publisher pub;
+
 ros::Publisher pub_odom;
+
 tf::Transform transform;
 tf::TransformBroadcaster br;
 
-/*float xE_old;
+/*
+float xE_old;
 float yN_old;
 float zU_old;
 float yaw;
@@ -40,7 +41,7 @@ float pitch;
 public:
   	pub_sub(){
   	sub =n.subscribe("/swiftnav/front/gps_pose", 1, &pub_sub::callback, this);
-	  pub = n.advertise<geometry_msgs::QuaternionStamped>("/enu_front", 1);
+	  pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_front", 1);
     pub_odom = n.advertise<nav_msgs::Odometry>("/odom_front", 1);
 
 
@@ -70,10 +71,9 @@ public:
 
      	p.header.stamp = ros::Time::now();
 		  p.header.frame_id = "car";  
-      p.quaternion.x=0;
-      p.quaternion.y=0;
-      p.quaternion.z=0;
-      p.quaternion.w=0;
+      p.vector.x=std::numeric_limits<float>::quiet_NaN();
+      p.vector.y=std::numeric_limits<float>::quiet_NaN();
+      p.vector.z=std::numeric_limits<float>::quiet_NaN();
       pub.publish(p);
 
     }
@@ -137,25 +137,26 @@ public:
 
       p.header.stamp = ros::Time::now();
 		  p.header.frame_id = "car";  
-      p.quaternion.x=xEast;
-      p.quaternion.y=yNorth;
-      p.quaternion.z=zUp;
-      p.quaternion.w=1;
+      p.vector.x=xEast;
+      p.vector.y=yNorth;
+      p.vector.z=zUp;
+
+      pub.publish(p);
 
       odom.header.stamp = ros::Time::now();
       odom.header.frame_id = "map";
-      odom.pose.pose.position.x =xEast/100;
+      odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 !!!!!!!!!
       odom.pose.pose.position.y = yNorth/100;
       odom.pose.pose.position.z = zUp/100;
       odom.child_frame_id = "car_obs";
 
       pub_odom.publish(odom);
-      pub.publish(p);
+
+
 
 /*
-
   xE_old=xEast-xE_old;
-  yN_old=yNorth-yN_old;
+  yN_old=yN_old-yNorth;
   zU_old=zUp-zU_old;
 
   yaw= acos(((xE_old*xE_old)+(yN_old*yN_old))/(sqrt(pow(xE_old,2)+pow(yN_old ,2)+pow(zU_old,2))*sqrt(pow(xE_old,2)+pow(yN_old,2))));
@@ -168,7 +169,7 @@ public:
 
 */
  
-  transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );
+  transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );  //DA modoifcare togliere diviso 100!!!!
 
   tf::Quaternion q;
   q.setRPY(0, 0, 0);
