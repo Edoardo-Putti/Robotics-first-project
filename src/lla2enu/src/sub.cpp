@@ -16,13 +16,14 @@ private:
   ros::Subscriber sub;
   ros::Publisher pub;
 
-  nav_msgs::Odometry odom;
-  ros::Publisher pub_odom;
+ // nav_msgs::Odometry odom;
+ // ros::Publisher pub_odom;
 
   geometry_msgs::Vector3Stamped p;
-  tf::Transform transform;
-  tf::TransformBroadcaster br;
+  //tf::Transform transform;
+ // tf::TransformBroadcaster br;
 
+  std::string bag_pos;
 
 /*float x1;
 float y1;
@@ -31,9 +32,11 @@ float z1;
 
 public:
  pub_sub_car(){
-   sub =n.subscribe("/swiftnav" + n.getNamespace() +"/gps_pose", 1, &pub_sub_car::callback, this);
+
+   n.getParam ("bag_pos", bag_pos);
+   sub =n.subscribe(bag_pos, 1, &pub_sub_car::callback, this);
    pub = n.advertise<geometry_msgs::Vector3Stamped>("enu", 1);
-   pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
+  // pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
 
 
  }
@@ -74,9 +77,9 @@ public:
   float longitude_init;
   float h0;
 
-  n.getParam ("/latitude_init", latitude_init);
-  n.getParam ("/longitude_init", longitude_init);
-  n.getParam ("/h0", h0);
+  n.getParam ("latitude_init", latitude_init);
+  n.getParam ("longitude_init", longitude_init);
+  n.getParam ("h0", h0);
 
   ROS_INFO("values: %f %f %f",latitude_init,longitude_init,h0);
 
@@ -134,7 +137,7 @@ public:
 
   pub.publish(p);
 
-    odom.header.stamp = ros::Time::now();
+   /*odom.header.stamp = ros::Time::now();
     odom.header.frame_id = "world";
       odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
       odom.pose.pose.position.y = yNorth/100;
@@ -156,7 +159,7 @@ public:
   y1=yNorth;
   z1=zUp;
 
-*/
+
   transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );  //DA modoifcare togliere diviso 100!!!!
 
   tf::Quaternion q;
@@ -165,7 +168,7 @@ public:
 
   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "tf_"+n.getNamespace()));
 
-
+*/
 
 
 }

@@ -32,12 +32,16 @@ private:
 	dynamic_reconfigure::Server<lla2enu::parametersConfig> server;
 	dynamic_reconfigure::Server<lla2enu::parametersConfig>::CallbackType f;
 
+	std::string input1;
+    std::string input2;
 
 
 public:
 	collector(){
-		sub_car.subscribe(n, "front/enu", 1);
-		sub_obs.subscribe(n, "obs/enu", 1);
+		n.getParam ("input1", input1);
+		n.getParam ("input2", input2);
+		sub_car.subscribe(n, input1, 1);
+		sub_obs.subscribe(n, input2, 1);
 		client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
 		custom_pub = n.advertise<lla2enu::custom>("custom_message",10);
 		sync.reset(new Sync(MySyncPolicy(10), sub_car, sub_obs));

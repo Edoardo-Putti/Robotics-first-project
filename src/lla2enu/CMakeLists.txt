@@ -54,4 +54,8 @@ add_executable(distance_calc src/distance_calc.cpp)
 add_dependencies(distance_calc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(distance_calc ${catkin_LIBRARIES})
 
+add_executable(tf_odom src/tf_odom.cpp)
+add_dependencies(tf_odom ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(tf_odom ${catkin_LIBRARIES})
+
 
