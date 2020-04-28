@@ -27,9 +27,10 @@
       <node pkg="lla2enu" name="distance_calc" type="distance_calc"/>
 
 
-    <node pkg="lla2enu" name="tf_odom" type="tf_odom"/>
+   <!-- <node pkg="lla2enu" name="tf_odom" type="tf_odom"/>
         <param name="input1" value="/front/enu" />
         <param name="input2" value="/obs/enu" />
 
+-->
 
 </launch>
