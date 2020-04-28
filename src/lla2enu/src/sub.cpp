@@ -12,12 +12,10 @@ class pub_sub_car
 {
 
 
-
+ros::NodeHandle n;
 private:
-  
-  std::string frame;
 
-  ros::NodeHandle n;
+  
   ros::Subscriber sub;
   ros::Publisher pub;
 
@@ -36,10 +34,9 @@ float z1;
 
 public:
  pub_sub_car(){
-   n.getParam ("/frame", frame);
-   sub =n.subscribe("/swiftnav/"+frame+"/gps_pose", 1, &pub_sub_car::callback, this);
-   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_"+frame, 1);
-   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_"+frame, 10);
+   sub =n.subscribe("input", 1, &pub_sub_car::callback, this);
+   pub = n.advertise<geometry_msgs::Vector3Stamped>("enu", 1);
+   pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
 
 
  }
@@ -67,7 +64,7 @@ public:
 
 
    p.header.stamp = ros::Time::now();
-   p.header.frame_id = frame;
+   p.header.frame_id = "car";
    p.vector.x=std::numeric_limits<float>::quiet_NaN();
    p.vector.y=std::numeric_limits<float>::quiet_NaN();
    p.vector.z=std::numeric_limits<float>::quiet_NaN();
@@ -133,7 +130,7 @@ public:
 
 
   p.header.stamp = ros::Time::now();
-  p.header.frame_id = frame;
+  p.header.frame_id = "car";
   p.vector.x=xEast;
   p.vector.y=yNorth;
   p.vector.z=zUp;
@@ -145,7 +142,7 @@ public:
       odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
       odom.pose.pose.position.y = yNorth/100;
       odom.pose.pose.position.z = zUp/100;
-      odom.child_frame_id = frame+"_odom";
+      odom.child_frame_id = "odom";
 
       pub_odom.publish(odom);
 
@@ -169,7 +166,7 @@ public:
   q.setRPY(0, 0, 0);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", frame+"_tf"));
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "tf"));
 
 
 
@@ -183,7 +180,7 @@ int main(int argc, char **argv){
 
 
 	ros::init(argc, argv, "listener");
-
+  ros::NodeHandle n; 
   pub_sub_car my_pub_sub;
 
 
