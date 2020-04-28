@@ -4,7 +4,6 @@
 
  <group ns="front">
     <node pkg="lla2enu" name="sim" type="enu"/>
-    <remap from="front/input" to="swiftnav/front/gps_pose"/>
         <param name="latitude_init" value="45.6216561271" />
         <param name="longitude_init" value="9.28155230131" />
         <param name="h0" value="224.616616895" />
@@ -12,7 +11,7 @@
 
 <group ns="obs">
     <node pkg="lla2enu" name="sim" type="enu" />
-     <remap from="obs/input" to="swiftnav/obs/gps_pose"/>
+        <param name="latitude_init" value="45.6216561271" />
         <param name="latitude_init" value="45.6216561271" />
         <param name="longitude_init" value="9.28155230131" />
         <param name="h0" value="224.616616895" />
