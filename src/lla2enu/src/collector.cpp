@@ -36,8 +36,8 @@ private:
 
 public:
 	collector(){
-		sub_car.subscribe(n, "enu_front", 10);
-		sub_obs.subscribe(n, "enu_obs", 10);
+		sub_car.subscribe(n, "front/enu", 1);
+		sub_obs.subscribe(n, "obs/enu", 1);
 		client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
 		custom_pub = n.advertise<lla2enu::custom>("custom_message",10);
 		sync.reset(new Sync(MySyncPolicy(10), sub_car, sub_obs));
