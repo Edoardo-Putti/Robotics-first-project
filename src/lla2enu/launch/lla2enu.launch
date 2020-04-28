@@ -1,19 +1,27 @@
 <launch>
 
-    <node pkg="rosbag" type="play" name="player" output="screen" args="-r 10 -l $(dirname)/project.bag"/>
+<node pkg="rosbag" type="play" name="player" output="screen" args="-r 10 -l $(dirname)/project.bag"/>
 
-    <node pkg="lla2enu" name="front" type="enu_front"/>
+ <group ns="front">
+    <node pkg="lla2enu" name="sim" type="enu"/>
+    <remap from="front/input" to="swiftnav/front/gps_pose"/>
         <param name="latitude_init" value="45.6216561271" />
         <param name="longitude_init" value="9.28155230131" />
         <param name="h0" value="224.616616895" />
-        
+ </group>
 
-    <node pkg="lla2enu" name="obstacle" type="enu_obs"/>
+<group ns="obs">
+    <node pkg="lla2enu" name="sim" type="enu" />
+     <remap from="obs/input" to="swiftnav/obs/gps_pose"/>
         <param name="latitude_init" value="45.6216561271" />
         <param name="longitude_init" value="9.28155230131" />
         <param name="h0" value="224.616616895" />
+ </group>
     
      <node pkg="lla2enu" name="collector" type="collector"/>
+     <remap from="a" to="front/enu"/>
+      <remap from="b" to="obs/enu"/>
+
          <param name="safe" value="5" />
         <param name="unsafe" value="1" />
 

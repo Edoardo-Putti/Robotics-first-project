@@ -9,12 +9,7 @@
 class pub_sub_obstacle
 {
 
-/*
-message structure of a quaternion 4 float x,y,z,w.
-float w will be the value which will tell us if the GPS work or not.
-Can't use x=0,y=0,z=0 since if i'm in the initial position i will have that
-xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
-  */
+
 
 
 
@@ -33,8 +28,8 @@ private:
 
 public:
  pub_sub_obstacle(){
-   sub1 =n.subscribe("/swiftnav/obs/gps_pose", 10, &pub_sub_obstacle::callback, this);
-   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_obs", 10);
+   sub1 =n.subscribe("/swiftnav/obs/gps_pose", 1, &pub_sub_obstacle::callback, this);
+   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_obs", 1);
    pub_odom = n.advertise<nav_msgs::Odometry>("/odom_obs", 10);
 
  }
@@ -164,7 +159,7 @@ public:
 
 int main(int argc, char **argv){
 
-	ros::init(argc, argv, "listener_obstacle");
+	ros::init(argc, argv, "listener");
 
   pub_sub_obstacle my_pub_sub;
 

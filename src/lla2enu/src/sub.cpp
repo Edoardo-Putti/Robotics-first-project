@@ -10,17 +10,13 @@
 
 class pub_sub_car
 {
-/*
-message structure of a quaternion 4 float x,y,z,w.
-float w will be the value which will tell us if the GPS work or not.
-Can't use x=0,y=0,z=0 since if i'm in the initial position i will have that
-xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
-*/
 
 
 
 private:
   
+  std::string frame;
+
   ros::NodeHandle n;
   ros::Subscriber sub;
   ros::Publisher pub;
@@ -33,18 +29,17 @@ private:
   tf::TransformBroadcaster br;
 
 
-float x1;
+/*float x1;
 float y1;
 float z1;
-float yaw;
-float pitch;
-
+*/
 
 public:
  pub_sub_car(){
-   sub =n.subscribe("/swiftnav/front/gps_pose", 10, &pub_sub_car::callback, this);
-   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_front", 10);
-   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_front", 10);
+   n.getParam ("/frame", frame);
+   sub =n.subscribe("/swiftnav/"+frame+"/gps_pose", 1, &pub_sub_car::callback, this);
+   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_"+frame, 1);
+   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_"+frame, 10);
 
 
  }
@@ -72,7 +67,7 @@ public:
 
 
    p.header.stamp = ros::Time::now();
-   p.header.frame_id = "car";
+   p.header.frame_id = frame;
    p.vector.x=std::numeric_limits<float>::quiet_NaN();
    p.vector.y=std::numeric_limits<float>::quiet_NaN();
    p.vector.z=std::numeric_limits<float>::quiet_NaN();
@@ -138,7 +133,7 @@ public:
 
 
   p.header.stamp = ros::Time::now();
-  p.header.frame_id = "car";
+  p.header.frame_id = frame;
   p.vector.x=xEast;
   p.vector.y=yNorth;
   p.vector.z=zUp;
@@ -150,32 +145,31 @@ public:
       odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
       odom.pose.pose.position.y = yNorth/100;
       odom.pose.pose.position.z = zUp/100;
-      odom.child_frame_id = "car_obs";
+      odom.child_frame_id = frame+"_odom";
 
       pub_odom.publish(odom);
 
 
-
+/*
 
   x1=xEast-x1;
   y1=yNorth-y1;
   z1=zUp-z1;
   
-  yaw = acos((pow(x1,2)+pow(y1,2))/(sqrt(pow(x1,2)+pow(y1,2)+pow(z1,2))*(sqrt(pow(x1,2)+pow(y1,2)))));
-  pitch = acos(pow(y1,2)/(sqrt(pow(x1,2)+pow(y1,2))*y1));
+
 
   x1=xEast;
   y1=yNorth;
   z1=zUp;
 
-
+*/
   transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );  //DA modoifcare togliere diviso 100!!!!
 
   tf::Quaternion q;
-  q.setRPY(0, pitch, yaw);
+  q.setRPY(0, 0, 0);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "car_tf"));
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", frame+"_tf"));
 
 
 
@@ -187,7 +181,8 @@ public:
 
 int main(int argc, char **argv){
 
-	ros::init(argc, argv, "listener_front");
+
+	ros::init(argc, argv, "listener");
 
   pub_sub_car my_pub_sub;
 
