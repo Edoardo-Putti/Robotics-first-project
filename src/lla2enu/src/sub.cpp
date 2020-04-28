@@ -11,11 +11,8 @@
 class pub_sub_car
 {
 
-
-ros::NodeHandle n;
 private:
-
-  
+  ros::NodeHandle n;  
   ros::Subscriber sub;
   ros::Publisher pub;
 
@@ -34,7 +31,7 @@ float z1;
 
 public:
  pub_sub_car(){
-   sub =n.subscribe("/swiftnav/" + n.getNamespace() +"/gps_pose", 1, &pub_sub_car::callback, this);
+   sub =n.subscribe("/swiftnav" + n.getNamespace() +"/gps_pose", 1, &pub_sub_car::callback, this);
    pub = n.advertise<geometry_msgs::Vector3Stamped>("enu", 1);
    pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
 
@@ -64,7 +61,7 @@ public:
 
 
    p.header.stamp = ros::Time::now();
-   p.header.frame_id = "car_"+n.getNamespace();
+   p.header.frame_id = "id"+n.getNamespace();
    p.vector.x=std::numeric_limits<float>::quiet_NaN();
    p.vector.y=std::numeric_limits<float>::quiet_NaN();
    p.vector.z=std::numeric_limits<float>::quiet_NaN();
@@ -130,19 +127,19 @@ public:
 
 
   p.header.stamp = ros::Time::now();
-  p.header.frame_id = "car_"+n.getNamespace();
+  p.header.frame_id = "id"+n.getNamespace();
   p.vector.x=xEast;
   p.vector.y=yNorth;
   p.vector.z=zUp;
 
   pub.publish(p);
 
-  odom.header.stamp = ros::Time::now();
-  odom.header.frame_id = "map";
-      odom.pose.pose.position.x =xEast/1000;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
-      odom.pose.pose.position.y = yNorth/1000;
-      odom.pose.pose.position.z = zUp/1000;
-      odom.child_frame_id = "odom_"+n.getNamespace();
+    odom.header.stamp = ros::Time::now();
+    odom.header.frame_id = "world";
+      odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
+      odom.pose.pose.position.y = yNorth/100;
+      odom.pose.pose.position.z = zUp/100;
+      odom.child_frame_id = "odom"+n.getNamespace();
 
       pub_odom.publish(odom);
 
@@ -160,20 +157,19 @@ public:
   z1=zUp;
 
 */
-  transform.setOrigin( tf::Vector3(xEast/1000, yNorth/1000, zUp/1000) );  //DA modoifcare togliere diviso 100!!!!
+  transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );  //DA modoifcare togliere diviso 100!!!!
 
   tf::Quaternion q;
   q.setRPY(0, 0, 0);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "tf_"+n.getNamespace()));
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "tf_"+n.getNamespace()));
 
 
 
 
 }
 }
-
 };
 
 int main(int argc, char **argv){
