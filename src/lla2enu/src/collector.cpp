@@ -36,10 +36,10 @@ private:
 
 public:
 	collector(){
-		sub_car.subscribe(n, "enu_front", 10);
-		sub_obs.subscribe(n, "enu_obs", 10);
+		sub_car.subscribe(n, "enu_front", 1);
+		sub_obs.subscribe(n, "enu_obs", 1);
 		client = n.serviceClient<lla2enu::DistanceCalculator>("distance_calc");
-		custom_pub = n.advertise<lla2enu::custom>("custom_message",10);
+		custom_pub = n.advertise<lla2enu::custom>("custom_message",1);
 		sync.reset(new Sync(MySyncPolicy(10), sub_car, sub_obs));
 		sync->registerCallback(boost::bind(&collector::callback,this, _1, _2));
 		n.getParam ("/unsafe", unsafe);

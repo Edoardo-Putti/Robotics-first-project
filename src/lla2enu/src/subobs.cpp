@@ -34,8 +34,8 @@ private:
 public:
  pub_sub_obstacle(){
    sub1 =n.subscribe("/swiftnav/obs/gps_pose", 10, &pub_sub_obstacle::callback, this);
-   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_obs", 10);
-   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_obs", 10);
+   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_obs", 1);
+   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_obs", 1);
 
  }
 

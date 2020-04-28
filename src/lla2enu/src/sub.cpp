@@ -33,18 +33,13 @@ private:
   tf::TransformBroadcaster br;
 
 
-float x1;
-float y1;
-float z1;
-float yaw;
-float pitch;
 
 
 public:
  pub_sub_car(){
    sub =n.subscribe("/swiftnav/front/gps_pose", 10, &pub_sub_car::callback, this);
-   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_front", 10);
-   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_front", 10);
+   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_front", 1);
+   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_front", 1);
 
 
  }
@@ -157,22 +152,12 @@ public:
 
 
 
-  x1=xEast-x1;
-  y1=yNorth-y1;
-  z1=zUp-z1;
-  
-  yaw = acos((pow(x1,2)+pow(y1,2))/(sqrt(pow(x1,2)+pow(y1,2)+pow(z1,2))*(sqrt(pow(x1,2)+pow(y1,2)))));
-  pitch = acos(pow(y1,2)/(sqrt(pow(x1,2)+pow(y1,2))*y1));
-
-  x1=xEast;
-  y1=yNorth;
-  z1=zUp;
 
 
   transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );  //DA modoifcare togliere diviso 100!!!!
 
   tf::Quaternion q;
-  q.setRPY(0, pitch, yaw);
+  q.setRPY(0, 0, 0);
   transform.setRotation(q);
 
   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "car_tf"));
