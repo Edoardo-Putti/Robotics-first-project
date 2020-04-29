@@ -6,7 +6,7 @@
 #include "geometry_msgs/Vector3Stamped.h"
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
-
+#define scale_factor 100
 
 class pub_sub_car
 {
@@ -32,21 +32,19 @@ private:
   float latitude_init;
   float longitude_init;
   float h0;
-  int scale_factor;
 //int conta;
 
 public:
  pub_sub_car(){
 
-   n.getParam ("bag_pos", bag_pos);
    n.getParam ("latitude_init", latitude_init);
    n.getParam ("longitude_init", longitude_init);
    n.getParam ("h0", h0);
-   n.getParam ("scale_factor", scale_factor);
-
-   sub =n.subscribe(bag_pos, 1, &pub_sub_car::callback, this);
+ 
+   sub =n.subscribe("/swiftnav"+n.getNamespace()+"/gps_pose", 1, &pub_sub_car::callback, this);
    pub = n.advertise<geometry_msgs::Vector3Stamped>("enu", 1);
    pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
+
    name_space=n.getNamespace();
    name_space.erase(0,1);
 //conta=0;
@@ -161,10 +159,7 @@ public:
   transform.setRotation(q);
 
   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "tf_"+name_space));
-/*
-  conta=conta+1;
- ROS_INFO("Contatore_sub: %d", conta);
-*/
+
 }
 }
 };
