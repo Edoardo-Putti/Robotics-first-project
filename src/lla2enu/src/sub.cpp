@@ -8,7 +8,6 @@
 #include <tf/transform_broadcaster.h>
 
 
-
 class pub_sub_car
 {
 
@@ -20,29 +19,37 @@ private:
  nav_msgs::Odometry odom;
  ros::Publisher pub_odom;
 
-  geometry_msgs::Vector3Stamped p;
+ 
 
   tf::Transform transform;
   tf::TransformBroadcaster br;
 
+//Global Variables
+
+  geometry_msgs::Vector3Stamped p;
   std::string bag_pos;
   std::string name_space;
-
-/*float x1;
-float y1;
-float z1;
-*/
+  float latitude_init;
+  float longitude_init;
+  float h0;
+  int scale_factor;
+//int conta;
 
 public:
  pub_sub_car(){
+
    n.getParam ("bag_pos", bag_pos);
+   n.getParam ("latitude_init", latitude_init);
+   n.getParam ("longitude_init", longitude_init);
+   n.getParam ("h0", h0);
+   n.getParam ("scale_factor", scale_factor);
+
    sub =n.subscribe(bag_pos, 1, &pub_sub_car::callback, this);
    pub = n.advertise<geometry_msgs::Vector3Stamped>("enu", 1);
    pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
    name_space=n.getNamespace();
    name_space.erase(0,1);
-  
-
+//conta=0;
  }
 
 
@@ -76,15 +83,8 @@ public:
 
  }
  else{
-      // fixed position
-  float latitude_init;
-  float longitude_init;
-  float h0;
-
-  n.getParam ("latitude_init", latitude_init);
-  n.getParam ("longitude_init", longitude_init);
-  n.getParam ("h0", h0);
-
+      
+      // fixed position already defined
   ROS_INFO("values: %f %f %f",latitude_init,longitude_init,h0);
 
 
@@ -130,9 +130,7 @@ public:
   float  yNorth = -cos_phi * sin_lambda * xd - sin_lambda * sin_phi * yd + cos_lambda * zd;
   float  zUp = cos_lambda * cos_phi * xd + cos_lambda * sin_phi * yd + sin_lambda * zd;
 
-  float xa=xEast/100;
-  float ya=yNorth/100;
-  float za=zUp/100;
+
 
   ROS_INFO("ENU position: [%f,%f, %f]", xEast, yNorth,zUp);
 
@@ -146,28 +144,27 @@ public:
   pub.publish(p);
 
 
-
    odom.header.stamp = ros::Time::now();
-   odom.header.frame_id = "world";
-   odom.pose.pose.position.x =xa;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
-   odom.pose.pose.position.y = ya;
-   odom.pose.pose.position.z = za;
+   odom.header.frame_id = "map";
+   odom.pose.pose.position.x =xEast/scale_factor;
+   odom.pose.pose.position.y = yNorth/scale_factor;
+   odom.pose.pose.position.z = zUp/scale_factor;
    odom.child_frame_id = "odom_"+name_space;
 
-      pub_odom.publish(odom);
+   pub_odom.publish(odom);
 
 
-  transform.setOrigin( tf::Vector3(xa, ya,za) );  //DA modoifcare togliere diviso 100!!!!
+  transform.setOrigin( tf::Vector3(xEast/scale_factor, yNorth/scale_factor,zUp/scale_factor) );
 
   tf::Quaternion q;
   q.setRPY(0, 0, 0);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "tf_"+name_space));
-
-
-
-  
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "tf_"+name_space));
+/*
+  conta=conta+1;
+ ROS_INFO("Contatore_sub: %d", conta);
+*/
 }
 }
 };

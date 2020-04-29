@@ -40,10 +40,11 @@ add_executable(enu src/sub.cpp)
 add_dependencies(enu ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(enu ${catkin_LIBRARIES})
 
-
+#[[
 add_executable(enu_obs src/subobs.cpp)
 add_dependencies(enu_obs ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(enu_obs ${catkin_LIBRARIES})
+]]
 
 add_executable(collector src/collector.cpp)
 add_dependencies(collector custom_messages_generate_messages_cpp ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -54,8 +55,11 @@ add_executable(distance_calc src/distance_calc.cpp)
 add_dependencies(distance_calc ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(distance_calc ${catkin_LIBRARIES})
 
+#[[
 add_executable(tf_odom src/tf_odom.cpp)
 add_dependencies(tf_odom ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(tf_odom ${catkin_LIBRARIES})
+]]
+
 
 

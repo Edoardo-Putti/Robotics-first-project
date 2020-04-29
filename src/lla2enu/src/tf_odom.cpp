@@ -5,6 +5,7 @@
 #include "geometry_msgs/Vector3Stamped.h"
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
+#include <string>
 
 class pub_sub_obstacle
 {
@@ -30,17 +31,20 @@ private:
 
 
   	std::string input1;
-    std::string input2;
-
+    std::string name_space;
+int conta;
 
 public:
  pub_sub_obstacle(){
      	n.getParam ("input1", input1);
-		n.getParam ("input2", input2);
+	//	n.getParam ("input2", input2);
    sub1 =n.subscribe(input1, 1, &pub_sub_obstacle::callback_f, this);
-   sub2 =n.subscribe(input2, 1, &pub_sub_obstacle::callback_o, this);
+ //  sub2 =n.subscribe(input2, 1, &pub_sub_obstacle::callback_o, this);
    pub_odom = n.advertise<nav_msgs::Odometry>("/odom_front", 10);
-   pub_odom_o = n.advertise<nav_msgs::Odometry>("/odom_obs", 10);
+ //  pub_odom_o = n.advertise<nav_msgs::Odometry>("/odom_obs", 10);
+  name_space=n.getNamespace();
+   name_space.erase(0,1);
+  conta=0;
 
  }
 
@@ -48,18 +52,19 @@ public:
  void callback_f(const geometry_msgs::Vector3StampedConstPtr& msg){
   ROS_INFO("Input position: [%f,%f, %f]", msg->vector.x, msg->vector.y ,msg->vector.z);
 
-    float x=msg->vector.x/100;
+  conta=conta+1;
+  float x=msg->vector.x/100;
   float y=msg->vector.y/100;
   float z=msg->vector.z/100;
 
  if (isnan(msg->vector.x)){}
 else{
   odom.header.stamp = ros::Time::now();
-  odom.header.frame_id = "map";
+  odom.header.frame_id = "world";
   odom.pose.pose.position.x =x ;
   odom.pose.pose.position.y = y;
   odom.pose.pose.position.z = z;
-  odom.child_frame_id = "odom_front";
+  odom.child_frame_id = "odom1_"+name_space;
 
   pub_odom.publish(odom);
 
@@ -71,13 +76,14 @@ else{
   q.setRPY(0, 0, 0);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "tf_front"));
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "tf1_"+name_space));
 
+  ROS_INFO("Contatore_tf_odom: %d", conta);
  }
 }
 
 
- void callback_o(const geometry_msgs::Vector3StampedConstPtr& msg){
+/* void callback_o(const geometry_msgs::Vector3StampedConstPtr& msg){
   ROS_INFO("Input position: [%f,%f, %f]", msg->vector.x, msg->vector.y ,msg->vector.z);
   float x=msg->vector.x/100;
   float y=msg->vector.y/100;
@@ -105,7 +111,7 @@ else{
   br_o.sendTransform(tf::StampedTransform(transform_o, ros::Time::now(), "map", "tf_obs"));
 
 }
-}
+}*/
 
 };
 

@@ -5,17 +5,25 @@
  <group ns="front">
     <node pkg="lla2enu" name="front" type="enu"/>
         <param name="bag_pos" value="/swiftnav/front/gps_pose" />
+        <param name="scale_factor"  value="100" />
         <param name="latitude_init"  value="45.6216561271" />
-        <param name="longitude_init" value="9.28155230131" />
+        <param name="longitude_init"  value="9.28155230131" />
         <param name="h0" value="224.616616895" />
+
+      <!-- <node pkg="lla2enu" name="tf_odom" type="tf_odom"/>
+        <param name="input1" value="/front/enu" /> <-->
  </group>
 
 <group ns="obs">
     <node pkg="lla2enu" name="obs" type="enu" />
       <param name="bag_pos" value="/swiftnav/obs/gps_pose" />
+       <param name="scale_factor" value="100" />
         <param name="latitude_init" value="45.6216561271" />
         <param name="longitude_init" value="9.28155230131" />
         <param name="h0" value="224.616616895" />
+
+  <!--  <node pkg="lla2enu" name="tf_odom" type="tf_odom"/>
+        <param name="input1" value="/obs/enu" /> <-->
  </group>
     
      <node pkg="lla2enu" name="collector" type="collector"/>
@@ -27,10 +35,8 @@
       <node pkg="lla2enu" name="distance_calc" type="distance_calc"/>
 
 
-   <!-- <node pkg="lla2enu" name="tf_odom" type="tf_odom"/>
-        <param name="input1" value="/front/enu" />
-        <param name="input2" value="/obs/enu" />
 
--->
+
+
 
 </launch>
