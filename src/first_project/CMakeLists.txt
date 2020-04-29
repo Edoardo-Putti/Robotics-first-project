@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(lla2enu)
+project(first_project)
 
 ## Find catkin and any catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geodesy 
