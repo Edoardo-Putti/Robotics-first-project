@@ -1,6 +1,5 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include <string>
 #include "sensor_msgs/NavSatFix.h"
 #include <math.h>
 #include "geometry_msgs/Vector3Stamped.h"
@@ -11,37 +10,42 @@
 
 class pub_sub_car
 {
+/*
+message structure of a quaternion 4 float x,y,z,w.
+float w will be the value which will tell us if the GPS work or not.
+Can't use x=0,y=0,z=0 since if i'm in the initial position i will have that
+xd , yd, zd = 0 and so xEast, yNorth, and zUp equal to zero
+*/
+
+
 
 private:
-  ros::NodeHandle n;  
+  
+  ros::NodeHandle n;
   ros::Subscriber sub;
   ros::Publisher pub;
 
- nav_msgs::Odometry odom;
- ros::Publisher pub_odom;
+  nav_msgs::Odometry odom;
+  ros::Publisher pub_odom;
 
   geometry_msgs::Vector3Stamped p;
-
   tf::Transform transform;
   tf::TransformBroadcaster br;
+  std::string frame;
 
-  std::string bag_pos;
-  std::string name_space;
 
-/*float x1;
-float y1;
-float z1;
-*/
 
 public:
  pub_sub_car(){
-   n.getParam ("bag_pos", bag_pos);
-   sub =n.subscribe(bag_pos, 1, &pub_sub_car::callback, this);
-   pub = n.advertise<geometry_msgs::Vector3Stamped>("enu", 1);
-   pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
-   name_space=n.getNamespace();
-   name_space.erase(0,1);
-  
+
+   frame = n.getNamespace();  
+   //n = ros::NodeHandle n(frame);
+   frame.erase(0,1);
+
+   sub =n.subscribe("/swiftnav/"+frame+"/gps_pose", 1, &pub_sub_car::callback, this);
+   pub = n.advertise<geometry_msgs::Vector3Stamped>("/enu_"+frame, 1);
+   pub_odom = n.advertise<nav_msgs::Odometry>("/odom_"+frame, 1);
+
 
  }
 
@@ -68,7 +72,7 @@ public:
 
 
    p.header.stamp = ros::Time::now();
-   p.header.frame_id = "id"+name_space;
+   p.header.frame_id = "car";
    p.vector.x=std::numeric_limits<float>::quiet_NaN();
    p.vector.y=std::numeric_limits<float>::quiet_NaN();
    p.vector.z=std::numeric_limits<float>::quiet_NaN();
@@ -130,53 +134,51 @@ public:
   float  yNorth = -cos_phi * sin_lambda * xd - sin_lambda * sin_phi * yd + cos_lambda * zd;
   float  zUp = cos_lambda * cos_phi * xd + cos_lambda * sin_phi * yd + sin_lambda * zd;
 
-  float xa=xEast/100;
-  float ya=yNorth/100;
-  float za=zUp/100;
-
   ROS_INFO("ENU position: [%f,%f, %f]", xEast, yNorth,zUp);
 
 
   p.header.stamp = ros::Time::now();
-  p.header.frame_id = "id_"+name_space;
+  p.header.frame_id = frame;
   p.vector.x=xEast;
   p.vector.y=yNorth;
   p.vector.z=zUp;
 
   pub.publish(p);
 
-
-
-   odom.header.stamp = ros::Time::now();
-   odom.header.frame_id = "world";
-   odom.pose.pose.position.x =xa;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
-   odom.pose.pose.position.y = ya;
-   odom.pose.pose.position.z = za;
-   odom.child_frame_id = "odom_"+name_space;
+  odom.header.stamp = ros::Time::now();
+  odom.header.frame_id = "map";
+      odom.pose.pose.position.x =xEast/100;   //Togliere diviso 100 e modifica launch file esecuzione Bag !!!!!!!!!
+      odom.pose.pose.position.y = yNorth/100;
+      odom.pose.pose.position.z = zUp/100;
+      odom.child_frame_id = "car_"+ frame;
 
       pub_odom.publish(odom);
 
 
-  transform.setOrigin( tf::Vector3(xa, ya,za) );  //DA modoifcare togliere diviso 100!!!!
+
+
+
+
+  transform.setOrigin( tf::Vector3(xEast/100, yNorth/100, zUp/100) );  //DA modoifcare togliere diviso 100!!!!
 
   tf::Quaternion q;
   q.setRPY(0, 0, 0);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", "tf_"+name_space));
+  br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "tf_"+frame));
 
 
 
-  
+
 }
 }
+
 };
 
 int main(int argc, char **argv){
 
-
 	ros::init(argc, argv, "listener");
-  ros::NodeHandle n; 
+
   pub_sub_car my_pub_sub;
 
 
