@@ -6,7 +6,8 @@
 #include "geometry_msgs/Vector3Stamped.h"
 #include <nav_msgs/Odometry.h>
 #include <tf/transform_broadcaster.h>
-#define scale_factor 100
+
+#define scale_factor 1
 
 class pub_sub_car
 {
@@ -16,10 +17,8 @@ private:
   ros::Subscriber sub;
   ros::Publisher pub;
 
- nav_msgs::Odometry odom;
- ros::Publisher pub_odom;
-
- 
+  nav_msgs::Odometry odom;
+  ros::Publisher pub_odom;
 
   tf::Transform transform;
   tf::TransformBroadcaster br;
@@ -32,24 +31,21 @@ private:
   float latitude_init;
   float longitude_init;
   float h0;
-//int conta;
 
 public:
  pub_sub_car(){
-
-   n.getParam ("latitude_init", latitude_init);
-   n.getParam ("longitude_init", longitude_init);
-   n.getParam ("h0", h0);
  
    sub =n.subscribe("/swiftnav"+n.getNamespace()+"/gps_pose", 1, &pub_sub_car::callback, this);
    pub = n.advertise<geometry_msgs::Vector3Stamped>("enu", 1);
    pub_odom = n.advertise<nav_msgs::Odometry>("odom", 10);
 
+   n.getParam ("latitude_init", latitude_init);
+   n.getParam ("longitude_init", longitude_init);
+   n.getParam ("h0", h0);
+
    name_space=n.getNamespace();
    name_space.erase(0,1);
-//conta=0;
  }
-
 
  void callback(const sensor_msgs::NavSatFix::ConstPtr& msg){
   ROS_INFO("Input position: [%f,%f, %f]", msg->latitude, msg->longitude,msg->altitude);
@@ -80,6 +76,7 @@ public:
    pub.publish(p);
 
  }
+
  else{
       
       // fixed position already defined
@@ -103,9 +100,7 @@ public:
 
   ROS_INFO("ECEF position: [%f,%f, %f]", x, y,z);
 
-
       // ecef to enu
-
   lamb = deg_to_rad*(latitude_init);
   phi = deg_to_rad*(longitude_init);
   s = sin(lamb);
@@ -160,17 +155,15 @@ public:
 
   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "map", "tf_"+name_space));
 
-}
+  }
 }
 };
 
 int main(int argc, char **argv){
 
-
 	ros::init(argc, argv, "listener");
   ros::NodeHandle n; 
   pub_sub_car my_pub_sub;
-
 
   ros::spin();
 

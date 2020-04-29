@@ -63,6 +63,6 @@ the rqt_reconfigure will start automatically in few seconds;
 
 use dynamic reconfigure to set the parameters
 
-to visualize the system's trajectory start rviz and leave the fixed frame to "map" and add the tf; 
+to visualize the system's trajectory start rviz and leave the fixed frame to "map" and add the tf or the odometry; 
 
 ----------------------------------------------
