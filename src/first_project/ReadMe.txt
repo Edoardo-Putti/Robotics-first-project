@@ -22,18 +22,22 @@ of the car and the obstacle, ask for the service the distance and publish the cu
 with the computed distance and the flag.
 
 first_project/src/distance_calc.cpp:
-Source file of the node server responsible of computing the ditance between 2 ENU positions.
+Source file of the node server responsible of computing the distance between 2 ENU positions.
 
 
 first_project/launch/launcher.launch:
 Launch file will automatically play the given bag inside the launch folder,
 run two instances of the node defined in sub.cpp using two different frames one
 for the car and one for the obstacle, moreover it starts the collector node and the service.
-In the Launch file are also defined some initial parameters.
+In the Launch file are also defined some initial parameters:
+
+latitude_init, longitude_init, and h0 which represent respectively the latitude initial position, the longitude initial position, and the altitude initial positions used for the ENU computation, and set by default as the Car starting point.
+
+A safe and unsafe parameter which represents the inital value of the lower bound for the safe distance, and the lower bound for the unsafe distance.
 
 ----------------------------------------
 How to Use DYNAMIC RECONFIGURE:
-Dynamic recnfigure starts automatically thanks to the launch file.
+Dynamic reconfigure starts automatically thanks to the launch file.
 the parameter "safe" is the lower bound for the safe distance that goes from 5 to 100,
 with the default value equal to 5
 the parameter "unsafe" is the lower bound for the unsafe distance that goes from 1 to 5,
